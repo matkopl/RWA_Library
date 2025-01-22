@@ -59,7 +59,7 @@ namespace BL.Services
 
         public IEnumerable<Book> SearchBooks(string searchTerm, int? genreId, int page, int count)
         {
-            var query = _context.Books.AsQueryable();
+            var query = _context.Books.Include(b => b.Genre).AsQueryable();
 
             if (!string.IsNullOrEmpty(searchTerm))
             {

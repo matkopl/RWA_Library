@@ -1,32 +1,33 @@
+using AutoMapper;
+using BL.Models;
+using BL.Services;
+using BL.Viewmodels;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using WebApp.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace WebApp.Controllers
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IRepository<Genre> _genreRepository;
+    private readonly IRepository<Book> _bookRepository;
+    private readonly IMapper _mapper;
+
+    public HomeController(IHttpClientFactory httpClientFactory, IRepository<Genre> genreRepository, IRepository<Book> bookRepository, IMapper mapper)
     {
-        private readonly ILogger<HomeController> _logger;
+        _httpClientFactory = httpClientFactory;
+        _genreRepository = genreRepository;
+        _bookRepository = bookRepository;
+        _mapper = mapper;
+    }
 
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
+    public async Task<IActionResult> Index()
+    {
+        var genres = _genreRepository.GetAll();
+        ViewData["Genres"] = genres;
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+        var books = _bookRepository.GetAll();
+        var booksVM = _mapper.Map<IEnumerable<BookVM>>(books);
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        return View(booksVM);
     }
 }

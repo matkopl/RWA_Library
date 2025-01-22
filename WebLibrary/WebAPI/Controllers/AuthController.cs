@@ -1,26 +1,29 @@
-﻿using Azure.Identity;
+﻿using AutoMapper;
+using Azure.Identity;
 using BL.Models;
 using BL.Security;
 using BL.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using WebAPI.DTO;
+using BL.DTO;
 
 namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly IRepository<User> _userRepository;
         private readonly ILogRepository _logRepository;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
 
-        public UserController(IRepository<User> userRepository, ILogRepository logRepository, IConfiguration configuration)
+        public AuthController(IRepository<User> userRepository, ILogRepository logRepository, IConfiguration configuration, IMapper mapper)
         {
             _userRepository = userRepository;
             _logRepository = logRepository;
             _configuration = configuration;
+            _mapper = mapper;
         }
 
         [HttpPost("Register")]
@@ -41,18 +44,12 @@ namespace WebAPI.Controllers
             string salt = PasswordHashProvider.GetSalt();
             string hash = PasswordHashProvider.GetHash(registerDto.Password, salt);
 
-            var user = new User
-            {
-                UserName = registerDto.Username,
-                FirstName = registerDto.Username,
-                LastName = registerDto.Username,
-                Email = registerDto.Email,
-                Phone = registerDto.Phone,
-                IsAdmin = false,
-                PwdHash = hash,
-                PwdSalt = salt
-            };
+            var user = _mapper.Map<User>(registerDto);
 
+            user.PwdSalt = salt;
+            user.PwdHash = hash;
+            user.IsAdmin = false;
+      
             _userRepository.Create(user);
 
             _logRepository.AddLog($"Successfully registered user: {user.UserName} with id={user.Id}", 1);
@@ -110,7 +107,7 @@ namespace WebAPI.Controllers
                 var oldHash = PasswordHashProvider.GetHash(changePasswordDto.CurrentPassword, existingUser.PwdSalt);
                 if (oldHash != existingUser.PwdHash)
                 {
-                    _logRepository.AddLog("Password change failed, current password incorrect", 2);
+                    _logRepository.AddLog($"Password change failed for user: {changePasswordDto.Username}, current password incorrect", 2);
                     return BadRequest();
                 }
 

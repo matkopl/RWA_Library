@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebAPI.DTO
+namespace BL.DTO
 {
     public class ChangePasswordDto
     {
@@ -11,7 +11,7 @@ namespace WebAPI.DTO
         public string CurrentPassword { get; set; }
 
         [Required]
-        [MinLength(8, ErrorMessage = "Password needs to be atleast 8 charachters long")]
+        [MinLength(8, ErrorMessage = "Password needs to be at least 8 charachters long")]
         public string NewPassword { get; set; }
     }
 }

@@ -1,8 +1,111 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<BL.Viewmodels.BookVM>
+@{
+    ViewBag.Title = "WebLibrary";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-5">
+    <h2 class="text-center">Browse Books</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search by title or author..." value="@ViewBag.Search" />
+        </div>
+        <div class="col-md-3">
+            <select id="genreSelect" class="form-select">
+                <option value="">All Genres</option>
+                @foreach (var genre in ViewData["Genres"] as IEnumerable<BL.Models.Genre>)
+                {
+                    <option value="@genre.Id" selected>@genre.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button id="searchButton" class="btn btn-primary w-100">Search</button>
+        </div>
+    </div>
+
+    <div id="bookList">
+        @foreach (var book in Model)
+        {
+            <div class="list-group-item mb-3">
+                <h5 class="mb-1">@book.Name</h5>
+                <p class="mb-1"><strong>Author:</strong> @book.Author</p>
+                <p class="mb-1"><strong>Genre:</strong> @book.Genre</p>
+                <p>
+                    <strong>Availability:</strong>
+                    @if (book.IsAvailable)
+                    {
+                        <i class="fas fa-check-circle text-success"></i>
+                    }
+                    else
+                    {
+                        <i class="fas fa-times-circle text-danger"></i>
+                    }
+                </p>
+            </div>
+        }
+    </div>
 </div>
+
+<script>
+    document.getElementById("searchButton").addEventListener("click", async function () {
+        const search = document.getElementById("searchInput").value;
+        const genreId = document.getElementById("genreSelect").value;
+
+        try {
+            let url = `http://localhost:5097/api/Book/Search?page=1&count=100`;
+
+            if (search) {
+                url += `&search=${search}`;
+            }
+            if (genreId) {
+                url += `&genreId=${genreId}`;
+            }
+
+            const response = await fetch(url, {
+                method: "GET"
+            });
+
+            if (response.ok) {
+                const books = await response.json();
+                renderBooks(books);
+            } else {
+                renderError("No books found.");
+            }
+        } catch (error) {
+            renderError("An error occurred while searching for books.");
+            console.error(error);
+        }
+    });
+
+    function renderBooks(books) {
+        const bookList = document.getElementById("bookList");
+        bookList.innerHTML = "";
+
+        if (books.length > 0) {
+            books.forEach(book => {
+                const bookItem = document.createElement("div");
+                bookItem.className = "list-group-item mb-3";
+                bookItem.innerHTML = `
+                    <h5 class="mb-1">${book.name}</h5>
+                    <p class="mb-1"><strong>Author:</strong> ${book.author}</p>
+                    <p class="mb-1"><strong>Genre:</strong> ${book.genre}</p>
+                    <p>
+                        <strong>Availability:</strong>
+                        ${book.isAvailable
+                        ? '<i class="fas fa-check-circle text-success"></i>'
+                        : '<i class="fas fa-times-circle text-danger"></i>'}
+                    </p>
+                `;
+                bookList.appendChild(bookItem);
+            });
+        } else {
+            renderError("No books found matching your search.");
+        }
+    }
+
+    function renderError(message) {
+        const bookList = document.getElementById("bookList");
+        bookList.innerHTML = `<p class="text-center text-muted">${message}</p>`;
+    }
+</script>

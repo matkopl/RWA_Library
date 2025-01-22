@@ -12,7 +12,6 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
     public class BookController : ControllerBase
     {
         private readonly IRepository<Book> _bookRepository;
@@ -78,8 +77,9 @@ namespace WebAPI.Controllers
         }
 
         // POST api/<BookController>
+        [Authorize(Roles = "Admin")]
         [HttpPost("Create")]
-        public IActionResult CreateBook([FromBody] BookDto value)
+        public IActionResult CreateBook([FromBody] CreateUpdateBookDto value)
         {
             if (!ModelState.IsValid)
             {
@@ -91,8 +91,8 @@ namespace WebAPI.Controllers
                 var book = _mapper.Map<Book>(value);
                 var createdBook = _bookRepository.Create(book);
 
-                var bookDto = _mapper.Map<BookDto>(createdBook);
-                _logRepository.AddLog($"Succesfully created book {bookDto.Name} with id={bookDto.Id}", 3);
+                var createBookDto = _mapper.Map<CreateUpdateBookDto>(createdBook);
+                _logRepository.AddLog($"Succesfully created book {createdBook.Name} with id={createdBook.Id}", 3);
                 return Ok(book);
                 //return CreatedAtAction(nameof(GetBookById), new { id = bookDto.Id }, bookDto);
             }
@@ -104,8 +104,9 @@ namespace WebAPI.Controllers
         }
 
         // PUT api/<BookController>/5
+        [Authorize(Roles = "Admin")]
         [HttpPut("Update/{id}")]
-        public IActionResult Put(int id, [FromBody] BookDto value)
+        public IActionResult Put(int id, [FromBody] CreateUpdateBookDto value)
         {
             if (!ModelState.IsValid)
             {
@@ -118,7 +119,7 @@ namespace WebAPI.Controllers
                 var book = _mapper.Map<Book>(value);
                 var updatedBook = _bookRepository.Edit(id, book);
 
-                var bookDto = _mapper.Map<BookDto>(updatedBook);
+                var bookDto = _mapper.Map<CreateUpdateBookDto>(updatedBook);
                 _logRepository.AddLog($"Succesfully updated book with id={id}", 3);
                 return Ok(bookDto);
             }
@@ -130,6 +131,7 @@ namespace WebAPI.Controllers
         }
 
         // DELETE api/<BookController>/5
+        [Authorize(Roles = "Admin")]
         [HttpDelete("Delete/{id}")]
         public IActionResult Delete(int id)
         {
@@ -154,18 +156,19 @@ namespace WebAPI.Controllers
             }
         }
 
-        [HttpGet("search")]
-        public IActionResult Search([FromQuery] string name, [FromQuery] int? genreId, [FromQuery] int page = 1, [FromQuery] int count = 10)
+        [HttpGet("Search")]
+        public IActionResult Search([FromQuery] string? search, [FromQuery] int? genreId, [FromQuery] int page = 1, [FromQuery] int count = 10)
         {
-            if (string.IsNullOrEmpty(name))
-            {
-                return BadRequest("Name parameter is required");
-            }
-
             try
             {
                 var bookRepo = (BookRepository)_bookRepository;
-                var books = bookRepo.SearchBooks(name, genreId, page, count);
+
+                if (string.IsNullOrEmpty(search))
+                {
+                    search = ""; 
+                }
+
+                var books = bookRepo.SearchBooks(search, genreId, page, count);
 
                 if (!books.Any())
                 {
@@ -173,8 +176,10 @@ namespace WebAPI.Controllers
                     return NotFound();
                 }
 
-                _logRepository.AddLog($"Successfully listed all books with the search term: {name}", 2);
-                return Ok(books);
+                var bookDtos = _mapper.Map<IEnumerable<BookDto>>(books);
+
+                _logRepository.AddLog($"Successfully listed all books with the search term: {search}", 2);
+                return Ok(bookDtos);
             }
             catch (Exception e)
             {

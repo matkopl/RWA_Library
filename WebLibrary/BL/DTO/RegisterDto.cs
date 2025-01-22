@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebAPI.DTO
+namespace BL.DTO
 {
     public class RegisterDto
     {
@@ -23,9 +23,5 @@ namespace WebAPI.DTO
 
         [Required(ErrorMessage = "Phone number is required")]
         public string Phone { get; set; }
-
-        [Required]
-        public bool isAdministrator { get; set; } = false;
-
     }
 }
