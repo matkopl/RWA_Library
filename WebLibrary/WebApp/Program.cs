@@ -20,7 +20,7 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddScoped<IRepository<User>, UserRepository>();
 builder.Services.AddScoped<IRepository<Book>, BookRepository>();
-builder.Services.AddScoped<ILocationRepository, LocationRepository>();
+builder.Services.AddScoped<IBookLocationRepository, BookLocationRepository>();
 builder.Services.AddScoped<IRepository<Genre>, GenreRepository>();
 builder.Services.AddScoped<ILogRepository, LogRepository>();
 // Add services to the container.

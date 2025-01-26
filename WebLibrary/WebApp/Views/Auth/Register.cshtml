@@ -1,5 +1,56 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model BL.Viewmodels.RegisterVM
+
 @{
+    ViewData["Title"] = "Register";
 }
+
+<h2>Register</h2>
+
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title text-center">Register</h2>
+                        <form method="post">
+                            <div class="mb-3">
+                                <label asp-for="Username" class="form-label">Username</label>
+                                <input asp-for="Username" class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Password" class="form-label">Password</label>
+                                <input asp-for="Password" class="form-control" type="password" />
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="FirstName" class="form-label">First Name</label>
+                                <input asp-for="FirstName" class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="LastName" class="form-label">Last Name</label>
+                                <input asp-for="LastName" class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Email" class="form-label">Email</label>
+                                <input asp-for="Email" class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Phone" class="form-label">Phone</label>
+                                <input asp-for="Phone" class="form-control" />
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Register</button>
+                            </div>
+                        </form>
+                        <div class="text-center mt-3">
+                            <span>Already have an account? </span>
+                            <a href="/Auth/Login" class="text-primary">Login</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-8kh+OflPtnuD1/Bx4W7xj9EJTkuyJj4sESyS9O4xU8YmhtCebH69yDHe3ydbWS1n" crossorigin="anonymous"></script>
+</body>

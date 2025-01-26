@@ -1,0 +1,46 @@
+﻿@model IEnumerable<BL.Viewmodels.BookVM>
+
+@{
+    ViewData["Title"] = "Books";
+}
+
+<h2>Books</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Author</th>
+            <th>Genre</th>
+            <th>Availability</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var book in Model)
+        {
+            <tr>
+                <td>@book.Name</td>
+                <td>@book.Author</td>
+                <td>@book.Genre</td>
+                <td>
+                    @if (book.IsAvailable)
+                    {
+                        <i class="fas fa-check-circle text-success"></i>
+                    }
+                    else
+                    {
+                        <i class="fas fa-times-circle text-danger"></i>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@book.Id" class="btn btn-info">Details</a>
+                    <a asp-action="Edit" asp-route-id="@book.Id" class="btn btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@book.Id" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Create" class="btn btn-primary">Create New Book</a>

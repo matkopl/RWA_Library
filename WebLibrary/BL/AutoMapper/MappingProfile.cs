@@ -20,12 +20,29 @@ namespace BL.AutoMapper
                 .ForMember(dest => dest.GenreId, opt => opt.MapFrom(src => src.GenreId))
                 .ReverseMap();
 
-            CreateMap<BookDto, BookVM>()
+            CreateMap<BookDto, BookIndexVM>()
                 .ForMember(dest => dest.Genre, opt => opt.MapFrom(src => src.Genre))
+                .ReverseMap();
+
+            CreateMap<Book, BookIndexVM>()
+                .ForMember(dest => dest.Genre, opt => opt.MapFrom(src => src.Genre.Name))
                 .ReverseMap();
 
             CreateMap<Book, BookVM>()
                 .ForMember(dest => dest.Genre, opt => opt.MapFrom(src => src.Genre.Name))
+                .ReverseMap();
+
+            CreateMap<CreateBookVM, Book>()
+                .ForMember(dest => dest.GenreId, opt => opt.MapFrom(src => src.GenreId))
+                .ReverseMap();
+
+            CreateMap<UpdateBookVM, Book>()
+                .ForMember(dest => dest.GenreId, opt => opt.MapFrom(src => src.GenreId))
+                .ReverseMap();
+
+            CreateMap<RegisterVM, User>();
+
+            CreateMap<CreateUpdateBookDto, CreateBookVM>()
                 .ReverseMap();
         }
     }

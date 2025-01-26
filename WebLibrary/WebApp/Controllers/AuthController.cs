@@ -22,7 +22,6 @@ namespace WebApp.Controllers
             _mapper = mapper;
         }
 
-        // GET: Login
         [HttpGet]
         public IActionResult Login(string returnUrl = null)
         {
@@ -30,7 +29,6 @@ namespace WebApp.Controllers
             return View(model);
         }
 
-        // POST: Login
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginVM loginVM)
@@ -67,7 +65,6 @@ namespace WebApp.Controllers
             return RedirectToAction("Index", "Home");  
         }
 
-        // POST: Logout
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
@@ -75,9 +72,46 @@ namespace WebApp.Controllers
             return RedirectToAction("Index", "Home");  
         }
 
+
+        [HttpGet]
         public IActionResult Register()
         {
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult Register(RegisterVM registerVM)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(registerVM);
+            }
+
+            var existingUser = _userRepository.GetAll().Any(u => u.UserName == registerVM.Username);
+            if (existingUser)
+            {
+                ModelState.AddModelError("Username", "Couldn't register, username already taken");
+                return View(registerVM);
+            }
+
+            var existingEmail = _userRepository.GetAll().Any(u => u.Email == registerVM.Email);
+            if (existingEmail)
+            {
+                ModelState.AddModelError("Email", "Couldn't register, email already taken");
+                return View(registerVM);
+            }
+
+            var salt = PasswordHashProvider.GetSalt();
+            var hash = PasswordHashProvider.GetHash(registerVM.Password, salt);
+
+            var user = _mapper.Map<User>(registerVM);
+            user.PwdSalt = salt;
+            user.PwdHash = hash;
+            user.IsAdmin = false;
+
+            _userRepository.Create(user);
+
+            return RedirectToAction("Login");
         }
 
         public IActionResult ChangePassword()
