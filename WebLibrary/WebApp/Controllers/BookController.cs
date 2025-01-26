@@ -57,11 +57,6 @@ namespace WebApp.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(CreateBookVM createBookVM)
         {
-            foreach (var key in ModelState.Keys.Where(k => k.Contains("Locations") && k.Contains("Name")).ToList())
-            {
-                ModelState.Remove(key);
-            }
-
             if (!ModelState.IsValid)
             {
                 ViewData["GenreId"] = new SelectList(_genreRepository.GetAll(), "Id", "Name", createBookVM.GenreId);
@@ -120,11 +115,6 @@ namespace WebApp.Controllers
             if (id != updateBookVM.Id)
             {
                 return NotFound();
-            }
-
-            foreach (var key in ModelState.Keys.Where(k => k.Contains("Locations") && k.Contains("Name")).ToList())
-            {
-                ModelState.Remove(key);
             }
 
             updateBookVM.IsAvailable = updateBookVM.Locations.Any(location => location.IsChecked);
