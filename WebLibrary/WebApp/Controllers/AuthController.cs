@@ -116,12 +116,12 @@ namespace WebApp.Controllers
             return RedirectToAction(nameof(RegisterConfirmation));
         }
 
-        public IActionResult ChangePassword()
+        public IActionResult RegisterConfirmation()
         {
             return View();
         }
 
-        public IActionResult RegisterConfirmation()
+        public IActionResult AccessDenied()
         {
             return View();
         }
