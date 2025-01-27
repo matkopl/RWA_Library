@@ -55,6 +55,9 @@ namespace BL.AutoMapper
                 .ForMember(dest => dest.LocationId, opt => opt.MapFrom(src => src.LocationId))
                 .ForMember(dest => dest.BookId, opt => opt.MapFrom(src => src.BookId))
                 .ReverseMap();
+
+            CreateMap<UserDetailsVM, User>().ReverseMap();
+
         }
     }
 }

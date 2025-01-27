@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
 namespace WebApp.Controllers
 {
@@ -112,10 +113,15 @@ namespace WebApp.Controllers
 
             _userRepository.Create(user);
 
-            return RedirectToAction("Login");
+            return RedirectToAction(nameof(RegisterConfirmation));
         }
 
         public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        public IActionResult RegisterConfirmation()
         {
             return View();
         }

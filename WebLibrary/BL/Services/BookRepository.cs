@@ -74,6 +74,7 @@ namespace BL.Services
             return query
                 .Skip((page - 1) * count)
                 .Take(count)
+                .OrderBy(b => b.Name ?? "")
                 .ToList();
         }
 

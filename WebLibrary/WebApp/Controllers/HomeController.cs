@@ -26,7 +26,7 @@ public class HomeController : Controller
         ViewData["Genres"] = genres;
 
         var books = _bookRepository.GetAll();
-        var booksVM = _mapper.Map<IEnumerable<BookIndexVM>>(books);
+        var booksVM = _mapper.Map<IEnumerable<BookIndexVM>>(books).OrderBy(b => b.Name);
 
         return View(booksVM);
     }
