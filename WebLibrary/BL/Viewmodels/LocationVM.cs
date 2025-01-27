@@ -16,5 +16,7 @@ namespace BL.Viewmodels
         public string Name { get; set; }
 
         public bool IsChecked { get; set; }
+
+        public bool IsAvailable { get; set; }
     }
 }

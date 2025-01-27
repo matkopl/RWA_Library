@@ -13,6 +13,7 @@ namespace BL.Services
         void RemoveBookLocation(int bookId, int locationId);
         void UpdateBookLocations(int bookId, IEnumerable<int> locationIds);
         public bool HasAvailableLocations(int bookId);
+        bool IsLocationAvailableForBook(int bookId, int locationId);
     }
 
     public class BookLocationRepository : IBookLocationRepository
@@ -43,6 +44,11 @@ namespace BL.Services
                     BookId = bookId,
                     LocationId = locationId
                 };
+
+                if (_context.Reservations.Any(r => r.BookId == bookId && r.LocationId == locationId))
+                {
+                    throw new InvalidOperationException("This location is already reserved for this book.");
+                }
 
                 _context.BookLocations.Add(bookLocation);
                 _context.SaveChanges();
@@ -92,6 +98,11 @@ namespace BL.Services
         public bool HasAvailableLocations(int bookId)
         {
             return _context.BookLocations.Any(bl => bl.BookId == bookId);
+        }
+
+        public bool IsLocationAvailableForBook(int bookId, int locationId) // New method
+        {
+            return !_context.Reservations.Any(r => r.BookId == bookId && r.LocationId == locationId);
         }
     }
 }

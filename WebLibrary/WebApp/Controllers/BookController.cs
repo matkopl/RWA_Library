@@ -26,7 +26,6 @@ namespace WebApp.Controllers
             _mapper = mapper;
         }
 
-
         // GET: Book
         public IActionResult Index()
         {
@@ -47,7 +46,8 @@ namespace WebApp.Controllers
                     {
                         Id = location.Id,
                         Name = location.Name,
-                        IsChecked = false
+                        IsChecked = false,
+                        IsAvailable = _bookLocationRepository.IsLocationAvailableForBook(0, location.Id)
                     }).ToList()
             };
 
@@ -67,7 +67,8 @@ namespace WebApp.Controllers
                     {
                         Id = location.Id,
                         Name = location.Name,
-                        IsChecked = false
+                        IsChecked = false,
+                        IsAvailable = _bookLocationRepository.IsLocationAvailableForBook(0, location.Id)
                     }).ToList();
 
                 return View(createBookVM);
@@ -78,6 +79,20 @@ namespace WebApp.Controllers
 
             foreach (var location in createBookVM.Locations.Where(l => l.IsChecked))
             {
+                if (!_bookLocationRepository.IsLocationAvailableForBook(book.Id, location.Id))
+                {
+                    ModelState.AddModelError("", $"Location '{location.Name}' is already reserved for this book.");
+                    createBookVM.Locations = _bookLocationRepository.GetAllLocations()
+                        .Select(loc => new LocationVM
+                        {
+                            Id = loc.Id,
+                            Name = loc.Name,
+                            IsChecked = createBookVM.Locations.Any(l => l.Id == loc.Id && l.IsChecked),
+                            IsAvailable = _bookLocationRepository.IsLocationAvailableForBook(book.Id, loc.Id)
+                        }).ToList();
+                    return View(createBookVM);
+                }
+
                 _bookLocationRepository.AddBookLocation(book.Id, location.Id);
             }
 
@@ -102,7 +117,8 @@ namespace WebApp.Controllers
                 {
                     Id = location.Id,
                     Name = location.Name,
-                    IsChecked = _bookLocationRepository.GetLocationsByBookId(id).Any(bl => bl.Id == location.Id)
+                    IsChecked = _bookLocationRepository.GetLocationsByBookId(id).Any(bl => bl.Id == location.Id),
+                    IsAvailable = _bookLocationRepository.IsLocationAvailableForBook(id, location.Id)
                 }).ToList();
 
             ViewData["GenreId"] = new SelectList(_genreRepository.GetAll(), "Id", "Name", book.GenreId);
@@ -128,7 +144,8 @@ namespace WebApp.Controllers
                     {
                         Id = location.Id,
                         Name = location.Name,
-                        IsChecked = _bookLocationRepository.GetLocationsByBookId(id).Any(bl => bl.Id == location.Id)
+                        IsChecked = _bookLocationRepository.GetLocationsByBookId(id).Any(bl => bl.Id == location.Id),
+                        IsAvailable = _bookLocationRepository.IsLocationAvailableForBook(id, location.Id)
                     }).ToList();
 
                 return View(updateBookVM);
@@ -137,9 +154,29 @@ namespace WebApp.Controllers
             var book = _mapper.Map<Book>(updateBookVM);
             _bookRepository.Edit(id, book);
 
-            _bookLocationRepository.UpdateBookLocations(id, updateBookVM.Locations
+            foreach (var location in updateBookVM.Locations.Where(l => l.IsChecked))
+            {
+                if (!_bookLocationRepository.IsLocationAvailableForBook(id, location.Id))
+                {
+                    ModelState.AddModelError("", $"Location '{location.Name}' is already reserved for another reservation.");
+                    updateBookVM.Locations = _bookLocationRepository.GetAllLocations()
+                        .Select(loc => new LocationVM
+                        {
+                            Id = loc.Id,
+                            Name = loc.Name,
+                            IsChecked = updateBookVM.Locations.Any(l => l.Id == loc.Id && l.IsChecked),
+                            IsAvailable = _bookLocationRepository.IsLocationAvailableForBook(id, loc.Id)
+                        }).ToList();
+                    return View(updateBookVM);
+                }
+            }
+
+            var selectedLocationIds = updateBookVM.Locations
                 .Where(l => l.IsChecked)
-                .Select(l => l.Id).ToList());
+                .Select(l => l.Id)
+                .ToList();
+
+            _bookLocationRepository.UpdateBookLocations(id, selectedLocationIds);
 
             _bookAvailabilityService.UpdateBookAvailability(id);
 
@@ -183,7 +220,8 @@ namespace WebApp.Controllers
                 {
                     Id = location.Id,
                     Name = location.Name,
-                    IsChecked = true
+                    IsChecked = true,
+                    IsAvailable = _bookLocationRepository.IsLocationAvailableForBook(id, location.Id)
                 }).ToList();
 
             return View(bookVM);
