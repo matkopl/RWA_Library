@@ -162,13 +162,7 @@ namespace WebAPI.Controllers
             try
             {
                 var bookRepo = (BookRepository)_bookRepository;
-
-                if (string.IsNullOrEmpty(search))
-                {
-                    search = ""; 
-                }
-
-                var books = bookRepo.SearchBooks(search, genreId, page, count);
+                var books = bookRepo.SearchBooks(search ?? "", genreId, page, count);
 
                 if (!books.Any())
                 {

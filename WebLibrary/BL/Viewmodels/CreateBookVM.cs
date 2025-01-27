@@ -22,7 +22,7 @@ namespace BL.Viewmodels
         public string Description { get; set; }
 
         [Display(Name = "Available")]
-        public bool IsAvailable => Locations?.Any(l => l.IsChecked) == true;
+        public bool IsAvailable { get; set; }
 
         [Required(ErrorMessage = "Genre is required")]
         [Display(Name = "Genre")]

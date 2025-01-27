@@ -1,0 +1,36 @@
+﻿@model IEnumerable<BL.Viewmodels.ReservationVM>
+
+@{
+    ViewData["Title"] = "Reservations";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center">Current Reservations</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Book</th>
+                <th>Genre</th>
+                <th>Location</th>
+                <th>Reservation Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reservation in Model)
+            {
+                <tr>
+                    <td>@reservation.Book</td>
+                    <td>@reservation.Genre</td>
+                    <td>@reservation.Location</td>
+                    <td>@reservation.ReservationDate.ToShortDateString()</td>
+                    <td>
+                        <form asp-action="Delete" asp-route-id="@reservation.Id" method="post">
+                            <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

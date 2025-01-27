@@ -29,7 +29,7 @@ create table [Location] (
 )
 go
 
--- M-N
+-- M-N bridge
 create table BookLocation (
 	Id int primary key identity(1,1),
 	BookId int not null foreign key references [Book](Id) on delete cascade,
@@ -54,6 +54,7 @@ create table Reservation (
     Id int primary key identity(1,1),
     UserId int not null foreign key references [User](Id) on delete cascade,
     BookId int not null foreign key references Book(Id) on delete cascade,
+	LocationId int not null foreign key references [Location](Id) on delete cascade,
     ReservationDate datetime not null default getdate()
 )
 go

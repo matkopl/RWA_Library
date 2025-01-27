@@ -1,4 +1,5 @@
 ﻿using BL.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,6 +12,7 @@ namespace BL.Services
         void AddBookLocation(int bookId, int locationId);
         void RemoveBookLocation(int bookId, int locationId);
         void UpdateBookLocations(int bookId, IEnumerable<int> locationIds);
+        public bool HasAvailableLocations(int bookId);
     }
 
     public class BookLocationRepository : IBookLocationRepository
@@ -85,6 +87,11 @@ namespace BL.Services
             }
 
             _context.SaveChanges();
+        }
+
+        public bool HasAvailableLocations(int bookId)
+        {
+            return _context.BookLocations.Any(bl => bl.BookId == bookId);
         }
     }
 }

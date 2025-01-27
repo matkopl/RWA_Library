@@ -23,6 +23,8 @@ builder.Services.AddScoped<IRepository<Book>, BookRepository>();
 builder.Services.AddScoped<IBookLocationRepository, BookLocationRepository>();
 builder.Services.AddScoped<IRepository<Genre>, GenreRepository>();
 builder.Services.AddScoped<ILogRepository, LogRepository>();
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddScoped<BookAvailabilityService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

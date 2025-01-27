@@ -11,9 +11,13 @@ public partial class Reservation
 
     public int BookId { get; set; }
 
+    public int LocationId { get; set; }
+
     public DateTime ReservationDate { get; set; }
 
     public virtual Book Book { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;
+
+    public virtual Location Location { get; set; } = null!;
 }

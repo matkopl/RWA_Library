@@ -12,7 +12,8 @@ namespace BL.Viewmodels
     {
         public int Id { get; set; }
 
-        public string? Name { get; set; }
+        [ValidateNever]
+        public string Name { get; set; }
 
         public bool IsChecked { get; set; }
     }

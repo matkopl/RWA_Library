@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using BL.Models;
@@ -15,15 +14,18 @@ namespace WebApp.Controllers
         private readonly IRepository<Book> _bookRepository;
         private readonly IRepository<Genre> _genreRepository;
         private readonly IBookLocationRepository _bookLocationRepository;
+        private readonly BookAvailabilityService _bookAvailabilityService;
         private readonly IMapper _mapper;
 
-        public BookController(IRepository<Book> bookRepository, IRepository<Genre> genreRepository, IBookLocationRepository bookLocationRepository, IMapper mapper)
+        public BookController(IRepository<Book> bookRepository, IRepository<Genre> genreRepository, IBookLocationRepository bookLocationRepository, BookAvailabilityService bookAvailabilityService, IMapper mapper)
         {
             _bookRepository = bookRepository;
             _genreRepository = genreRepository;
             _bookLocationRepository = bookLocationRepository;
+            _bookAvailabilityService = bookAvailabilityService;
             _mapper = mapper;
         }
+
 
         // GET: Book
         public IActionResult Index()
@@ -79,9 +81,10 @@ namespace WebApp.Controllers
                 _bookLocationRepository.AddBookLocation(book.Id, location.Id);
             }
 
+            _bookAvailabilityService.UpdateBookAvailability(book.Id);
+
             return RedirectToAction(nameof(Index));
         }
-    
 
         // GET: Book/Edit/5
         public IActionResult Edit(int id)
@@ -117,8 +120,6 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            updateBookVM.IsAvailable = updateBookVM.Locations.Any(location => location.IsChecked);
-
             if (!ModelState.IsValid)
             {
                 ViewData["GenreId"] = new SelectList(_genreRepository.GetAll(), "Id", "Name", updateBookVM.GenreId);
@@ -136,10 +137,11 @@ namespace WebApp.Controllers
             var book = _mapper.Map<Book>(updateBookVM);
             _bookRepository.Edit(id, book);
 
-
             _bookLocationRepository.UpdateBookLocations(id, updateBookVM.Locations
                 .Where(l => l.IsChecked)
                 .Select(l => l.Id).ToList());
+
+            _bookAvailabilityService.UpdateBookAvailability(id);
 
             return RedirectToAction(nameof(Index));
         }
@@ -165,7 +167,6 @@ namespace WebApp.Controllers
             _bookRepository.Delete(id);
             return RedirectToAction(nameof(Index));
         }
-
 
         // GET: Book/Details/5
         public IActionResult Details(int id)

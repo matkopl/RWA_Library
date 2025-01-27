@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<BL.Viewmodels.BookIndexVM>
 @{
-    ViewBag.Title = "WebLibrary";
+    ViewData["Title"] = "Reserve book";
 }
 
 <div class="container mt-5">
@@ -15,7 +15,7 @@
                 <option value="">All Genres</option>
                 @foreach (var genre in ViewData["Genres"] as IEnumerable<BL.Models.Genre>)
                 {
-                    <option value="@genre.Id" selected>@genre.Name</option>
+                    <option value="@genre.Id">@genre.Name</option>
                 }
             </select>
         </div>
@@ -32,23 +32,31 @@
                 <p class="mb-1"><strong>Author:</strong> @book.Author</p>
                 <p class="mb-1"><strong>Genre:</strong> @book.Genre</p>
                 <p>
-                    <strong>Availability:</strong>
-                    @if (book.IsAvailable)
-                    {
+                <p>
+                    <strong>Available:</strong>
+                        @if (book.IsAvailable)
+                        {
                         <i class="fas fa-check-circle text-success"></i>
-                    }
-                    else
-                    {
+                        }
+                        else
+                        {
                         <i class="fas fa-times-circle text-danger"></i>
-                    }
+                        }
                 </p>
+
+                @if (book.IsAvailable && User.IsInRole("User"))
+                {
+                    <a href="@Url.Action("Create", "Reservation", new { bookId = book.Id })" class="btn btn-primary btn-sm">Reserve</a>
+                }
             </div>
         }
     </div>
 </div>
 
 <script>
-    document.getElementById("searchButton").addEventListener("click", async function () {
+    const role = @User.IsInRole("User").ToString().ToLower(); 
+
+    document.getElementById("searchButton").addEventListener("click", async function (e) {
         const search = document.getElementById("searchInput").value;
         const genreId = document.getElementById("genreSelect").value;
 
@@ -87,16 +95,19 @@
                 const bookItem = document.createElement("div");
                 bookItem.className = "list-group-item mb-3";
                 bookItem.innerHTML = `
-                    <h5 class="mb-1">${book.name}</h5>
-                    <p class="mb-1"><strong>Author:</strong> ${book.author}</p>
-                    <p class="mb-1"><strong>Genre:</strong> ${book.genre}</p>
-                    <p>
-                        <strong>Availability:</strong>
-                        ${book.isAvailable
+                            <h5 class="mb-1">${book.name}</h5>
+                            <p class="mb-1"><strong>Author:</strong> ${book.author}</p>
+                            <p class="mb-1"><strong>Genre:</strong> ${book.genre}</p>
+                            <p>
+                                <strong>Availability:</strong>
+                                ${book.isAvailable
                         ? '<i class="fas fa-check-circle text-success"></i>'
                         : '<i class="fas fa-times-circle text-danger"></i>'}
-                    </p>
-                `;
+                            </p>
+                            ${book.isAvailable && role === "true"
+                        ? `<a href="/Reservation/Create?bookId=${book.id}" class="btn btn-primary btn-sm">Reserve</a>`
+                        : ''}
+                        `;
                 bookList.appendChild(bookItem);
             });
         } else {
@@ -109,3 +120,4 @@
         bookList.innerHTML = `<p class="text-center text-muted">${message}</p>`;
     }
 </script>
+

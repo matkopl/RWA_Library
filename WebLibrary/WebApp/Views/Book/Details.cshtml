@@ -19,18 +19,20 @@
         <dt class="col-sm-2">Genre</dt>
         <dd class="col-sm-10">@Model.Genre</dd>
 
-        <dt class="col-sm-2">Availability</dt>
+        <dt class="col-sm-2">Available</dt>
         <dd class="col-sm-10">
             @if (Model.IsAvailable)
             {
-                <span class="text-success">Available</span>
+                <i class="fas fa-check-circle text-success"></i>
             }
             else
             {
-                <span class="text-danger">Not Available</span>
+                <i class="fas fa-times-circle text-danger"></i>
             }
         </dd>
 
+        @if (Model.AvailableLocations.Any()) 
+        {
         <dt class="col-sm-2">Locations</dt>
         <dd class="col-sm-10">
             <ul>
@@ -40,6 +42,7 @@
                 }
             </ul>
         </dd>
+        }
     </dl>
 </div>
 <a asp-action="Index" class="btn btn-primary">Back to List</a>
