@@ -6,9 +6,11 @@ using BL.Services;
 using AutoMapper;
 using BL.Viewmodels;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApp.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class BookController : Controller
     {
         private readonly IRepository<Book> _bookRepository;

@@ -6,12 +6,14 @@ using BL.Models;
 using BL.Security;
 using BL.Services;
 using BL.Viewmodels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 namespace WebApp.Controllers
 {
+    [Authorize]
     public class ProfileController : Controller
     {
         private readonly IRepository<User> _userRepository;
