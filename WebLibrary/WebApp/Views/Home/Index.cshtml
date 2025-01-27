@@ -32,7 +32,6 @@
                 <p class="mb-1"><strong>Author:</strong> @book.Author</p>
                 <p class="mb-1"><strong>Genre:</strong> @book.Genre</p>
                 <p>
-                <p>
                     <strong>Available:</strong>
                         @if (book.IsAvailable)
                         {
@@ -54,7 +53,7 @@
 </div>
 
 <script>
-    const role = @User.IsInRole("User").ToString().ToLower(); 
+    const role = "@(User.IsInRole("User") ? "User" : "Guest")";
 
     document.getElementById("searchButton").addEventListener("click", async function (e) {
         const search = document.getElementById("searchInput").value;
@@ -64,7 +63,7 @@
             let url = `http://localhost:5097/api/Book/Search?page=1&count=100`;
 
             if (search) {
-                url += `&search=${search}`;
+                url += `&search=${encodeURIComponent(search)}`;
             }
             if (genreId) {
                 url += `&genreId=${genreId}`;
@@ -95,19 +94,18 @@
                 const bookItem = document.createElement("div");
                 bookItem.className = "list-group-item mb-3";
                 bookItem.innerHTML = `
-                            <h5 class="mb-1">${book.name}</h5>
-                            <p class="mb-1"><strong>Author:</strong> ${book.author}</p>
-                            <p class="mb-1"><strong>Genre:</strong> ${book.genre}</p>
-                            <p>
-                                <strong>Availability:</strong>
-                                ${book.isAvailable
+                                <h5 class="mb-1">${book.name}</h5>
+                                <p class="mb-1"><strong>Author:</strong> ${book.author}</p>
+                                <p class="mb-1"><strong>Genre:</strong> ${book.genre}</p>
+                                <p>
+                                    <strong>Availability:</strong>
+                                    ${book.isAvailable
                         ? '<i class="fas fa-check-circle text-success"></i>'
                         : '<i class="fas fa-times-circle text-danger"></i>'}
-                            </p>
-                            ${book.isAvailable && role === "true"
+                                </p>
+                                    ${book.isAvailable && role === "User"
                         ? `<a href="/Reservation/Create?bookId=${book.id}" class="btn btn-primary btn-sm">Reserve</a>`
-                        : ''}
-                        `;
+                        : ''}`;
                 bookList.appendChild(bookItem);
             });
         } else {
