@@ -30,4 +30,9 @@ public class HomeController : Controller
 
         return View(booksVM);
     }
+
+    public IActionResult Privacy()
+    {
+        return View();
+    }
 }

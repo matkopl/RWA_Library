@@ -83,6 +83,7 @@ namespace WebApp.Controllers
             return Json(new { success = true, message = "Profile updated successfully." });
         }
 
+        // GET: Profile/ChangePassword
         public IActionResult ChangePassword()
         {
             return View();

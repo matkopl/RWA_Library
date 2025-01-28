@@ -7,44 +7,31 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BL.Models;
 using Microsoft.AspNetCore.Authorization;
+using BL.Services;
+using AutoMapper;
+using BL.Viewmodels;
 
 namespace WebApp.Controllers
 {
     [Authorize(Roles = "Admin")]
     public class LocationController : Controller
     {
-        private readonly WebLibraryContext _context;
+        private readonly IRepository<Location> _locationRepository;
+        private readonly IMapper _mapper;
 
-        public LocationController(WebLibraryContext context)
+        public LocationController(IRepository<Location> locationRepository, IMapper mapper)
         {
-            _context = context;
+            _locationRepository = locationRepository;
+            _mapper = mapper;
         }
 
         // GET: Location
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Locations.ToListAsync());
+            var locations = _locationRepository.GetAll();
+            return View(_mapper.Map<IEnumerable<LocationCrudVM>>(locations));
         }
 
-        // GET: Location/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var location = await _context.Locations
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (location == null)
-            {
-                return NotFound();
-            }
-
-            return View(location);
-        }
-
-        // GET: Location/Create
         public IActionResult Create()
         {
             return View();
@@ -55,31 +42,23 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] Location location)
+        public async Task<IActionResult> Create(LocationCrudVM locationCrudVM)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(location);
-                await _context.SaveChangesAsync();
+                _locationRepository.Create(_mapper.Map<Location>(locationCrudVM));
                 return RedirectToAction(nameof(Index));
             }
-            return View(location);
+
+            return View(locationCrudVM);
         }
 
         // GET: Location/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var location = _locationRepository.Get(id);
 
-            var location = await _context.Locations.FindAsync(id);
-            if (location == null)
-            {
-                return NotFound();
-            }
-            return View(location);
+            return View(_mapper.Map<LocationCrudVM>(location));
         }
 
         // POST: Location/Edit/5
@@ -87,52 +66,30 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Location location)
+        public async Task<IActionResult> Edit(int id, LocationCrudVM locationCrudVM)
         {
-            if (id != location.Id)
+            if (id != locationCrudVM.Id)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(location);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!LocationExists(location.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                var location = _mapper.Map<Location>(locationCrudVM);
+                _locationRepository.Edit(id, location);
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(location);
+
+            return View(locationCrudVM);
         }
 
         // GET: Location/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var location = _locationRepository.Get(id);
 
-            var location = await _context.Locations
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (location == null)
-            {
-                return NotFound();
-            }
-
-            return View(location);
+            return View(_mapper.Map<LocationCrudVM>(location));
         }
 
         // POST: Location/Delete/5
@@ -140,19 +97,14 @@ namespace WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var location = await _context.Locations.FindAsync(id);
+            var location = _locationRepository.Get(id);
+
             if (location != null)
             {
-                _context.Locations.Remove(location);
+                _locationRepository.Delete(id);
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool LocationExists(int id)
-        {
-            return _context.Locations.Any(e => e.Id == id);
         }
     }
 }

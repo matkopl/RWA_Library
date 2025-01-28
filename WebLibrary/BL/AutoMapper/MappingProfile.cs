@@ -58,6 +58,11 @@ namespace BL.AutoMapper
 
             CreateMap<UserDetailsVM, User>().ReverseMap();
 
+            CreateMap<Genre, GenreVM>().ReverseMap();
+
+            CreateMap<Location, LocationVM>().ReverseMap();
+
+            CreateMap<Location, LocationCrudVM>().ReverseMap();
         }
     }
 }
