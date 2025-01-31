@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<WebLibraryContext>(options =>
 {
-    options.UseSqlServer("name=ConnectionStrings:conStr");
+    options.UseSqlServer(builder.Configuration.GetConnectionString("conStr"));
 });
 
 builder.Services.AddHttpClient();
