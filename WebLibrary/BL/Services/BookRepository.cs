@@ -72,9 +72,9 @@ namespace BL.Services
             }
 
             return query
+                .OrderBy(b => b.Name ?? "")
                 .Skip((page - 1) * count)
                 .Take(count)
-                .OrderBy(b => b.Name ?? "")
                 .ToList();
         }
 
