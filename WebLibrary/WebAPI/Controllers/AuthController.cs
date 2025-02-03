@@ -53,7 +53,15 @@ namespace WebAPI.Controllers
             _userRepository.Create(user);
 
             _logRepository.AddLog($"Successfully registered user: {user.UserName} with id={user.Id}", 1);
-            return Ok(user);
+
+            return Ok(new
+            {
+                registerDto.Username,
+                registerDto.Email,
+                registerDto.FirstName,
+                registerDto.LastName,
+                registerDto.Phone
+            });
         }
 
         [HttpPost("Login")]
@@ -120,7 +128,7 @@ namespace WebAPI.Controllers
                 _userRepository.Edit(existingUser.Id, existingUser);
 
                 _logRepository.AddLog($"Successfully changed password for user {changePasswordDto.Username}", 1);
-                return Ok();
+                return Ok("Password has been successfully changed");
             }
             catch (Exception e)
             {
